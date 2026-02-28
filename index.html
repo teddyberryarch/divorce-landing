@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>헤어질, 결심 — 이혼 법률 시뮬레이션 리포트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700;900&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f0ebe4;
+    --red: #c0392b;
+    --red-dim: rgba(192,57,43,0.15);
+    --gold: #c9a84c;
+    --gray: #888;
+    --dark: #111;
+    --line: #1e1e1e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Noto Serif KR', serif;
+    line-height: 1.9;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+  }
+
+  /* 노이즈 배경 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── 네비 ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.95);
+    border-bottom-color: var(--line);
+    backdrop-filter: blur(8px);
+  }
+  .nav-logo {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--red); }
+  .nav-cta {
+    background: var(--red);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: #a93226; }
+
+  /* ── 히어로 ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 80px 80px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, var(--red-dim) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+  .hero h1 {
+    font-size: clamp(52px, 9vw, 108px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 32px;
+  }
+  .hero h1 .comma { color: var(--red); }
+  .hero-sub {
+    font-size: clamp(16px, 2vw, 20px);
+    color: #999;
+    max-width: 540px;
+    line-height: 1.8;
+    margin-bottom: 56px;
+    font-weight: 300;
+  }
+  .hero-cta {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    padding: 18px 48px;
+    font-size: 15px;
+    font-family: 'Noto Sans KR', sans-serif;
+    letter-spacing: 2px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+    align-self: flex-start;
+  }
+  .hero-cta:hover { background: #a93226; transform: translateY(-2px); }
+  .hero-price {
+    position: absolute;
+    right: 80px;
+    bottom: 80px;
+    text-align: right;
+  }
+  .hero-price .label {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 3px;
+    margin-bottom: 6px;
+  }
+  .hero-price .amount {
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--red);
+    line-height: 1;
+  }
+  .hero-price .unit {
+    font-size: 16px;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+
+  /* ── 섹션 공통 ── */
+  section { padding: 100px 0; border-bottom: 1px solid var(--line); }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 48px; }
+  .section-eyebrow {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  h2 {
+    font-size: clamp(30px, 4vw, 48px);
+    font-weight: 900;
+    line-height: 1.3;
+    letter-spacing: -1px;
+    margin-bottom: 36px;
+  }
+  .body-text {
+    font-size: 16px;
+    color: #bbb;
+    line-height: 2;
+    font-weight: 300;
+    max-width: 680px;
+    margin-bottom: 16px;
+  }
+  .body-text strong { color: var(--white); font-weight: 500; }
+
+  /* ── 인사이트 박스 ── */
+  .insight {
+    background: #111;
+    border-left: 4px solid var(--red);
+    padding: 32px 40px;
+    margin: 48px 0;
+    font-size: 18px;
+    line-height: 1.8;
+    color: var(--white);
+    font-weight: 400;
+  }
+  .insight em { color: var(--red); font-style: normal; }
+
+  /* ── 페인 그리드 ── */
+  .pain-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin: 48px 0;
+  }
+  .pain-item {
+    background: var(--dark);
+    padding: 28px 32px;
+    border-left: 3px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .pain-item:hover { border-left-color: var(--red); }
+  .pain-num {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+  }
+  .pain-item strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--white);
+  }
+  .pain-item p {
+    font-size: 13px;
+    color: #777;
+    line-height: 1.7;
+  }
+
+  /* ── 포지셔닝 박스 ── */
+  .position-box {
+    background: var(--red);
+    padding: 48px;
+    margin: 48px 0;
+  }
+  .position-box h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .position-box p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.9;
+    font-weight: 300;
+  }
+
+  /* ── 리포트 구성 ── */
+  .report-list { margin: 48px 0; }
+  .report-item {
+    display: flex;
+    gap: 28px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: flex-start;
+  }
+  .report-item:last-child { border-bottom: none; }
+  .report-num {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 2px;
+    min-width: 32px;
+    padding-top: 3px;
+  }
+  .report-content h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--white);
+  }
+  .report-content p {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.7;
+  }
+  .report-pages {
+    margin-left: auto;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+    color: #444;
+    white-space: nowrap;
+    padding-top: 3px;
+  }
+
+  /* ── 상품 그리드 ── */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin: 48px 0;
+  }
+  .product-card {
+    background: var(--dark);
+    padding: 36px 32px;
+  }
+  .product-card.main { background: var(--red); }
+  .product-card .p-label {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #555;
+    margin-bottom: 16px;
+  }
+  .product-card.main .p-label { color: rgba(255,255,255,0.6); }
+  .product-card .p-name {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .product-card .p-price {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--red);
+    margin-bottom: 16px;
+    line-height: 1;
+  }
+  .product-card.main .p-price { color: var(--white); }
+  .product-card .p-desc {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .product-card.main .p-desc { color: rgba(255,255,255,0.7); }
+
+  /* ── FAQ ── */
+  .faq-item {
+    border-bottom: 1px solid var(--line);
+    padding: 28px 0;
+  }
+  .faq-q {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--white);
+  }
+  .faq-q::before { content: 'Q. '; color: var(--red); }
+  .faq-a {
+    font-size: 14px;
+    color: #777;
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  /* ── CTA 섹션 ── */
+  .cta-section {
+    padding: 120px 0;
+    text-align: center;
+    border-bottom: none;
+  }
+  .cta-section h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    margin-bottom: 20px;
+  }
+  .cta-section p {
+    font-size: 16px;
+    color: #777;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+  .cta-btn {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    padding: 20px 64px;
+    font-size: 16px;
+    font-family: 'Noto Sans KR', sans-serif;
+    letter-spacing: 2px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .cta-btn:hover { background: #a93226; transform: translateY(-2px); }
+  .cta-note {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #444;
+    font-family: 'Noto Sans KR', sans-serif;
+    letter-spacing: 1px;
+  }
+
+  /* ── 푸터 ── */
+  footer {
+    padding: 48px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .logo {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  footer .logo span { color: var(--red); }
+  footer .meta {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11px;
+    color: #444;
+    letter-spacing: 1px;
+    text-align: right;
+  }
+
+  @media (max-width: 768px) {
+    .hero { padding: 100px 32px 60px; }
+    .hero-price { display: none; }
+    .pain-grid { grid-template-columns: 1fr; }
+    .product-grid { grid-template-columns: 1fr; }
+    nav { padding: 20px 24px; }
+    .container { padding: 0 24px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+    footer .meta { text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 네비 -->
+<nav id="nav">
+  <a href="#" class="nav-logo">헤어질<span>,</span> 결심</a>
+  <a href="divorce_form.html" class="nav-cta">리포트 신청</a>
+</nav>
+
+<!-- 히어로 -->
+<div class="hero">
+  <div class="hero-eyebrow">이혼 법률 시뮬레이션 · 베러비전</div>
+  <h1>헤어질<span class="comma">,</span><br>결심</h1>
+  <p class="hero-sub">
+    변호사를 만나기 전에 먼저 알아야 할 것들이 있습니다.<br>
+    재산분할, 위자료, 양육권 — AI가 당신의 상황을 분석하고<br>
+    현실적인 시뮬레이션 리포트를 작성합니다.
+  </p>
+  <a href="divorce_form.html" class="hero-cta">지금 신청하기</a>
+  <div class="hero-price">
+    <div class="label">이혼 설계 리포트</div>
+    <div class="amount">199,000</div>
+    <div class="unit">원</div>
+  </div>
+</div>
+
+<!-- 왜 이 서비스인가 -->
+<section>
+  <div class="container">
+    <div class="section-eyebrow reveal">왜 필요한가</div>
+    <h2 class="reveal">아무에게도<br>말 못하는 고민</h2>
+    <p class="body-text reveal">이혼을 고민하는 사람은 많습니다. 하지만 선뜻 변호사에게 가지 못합니다. 치부를 드러내야 하고, 상담비가 비싸고, 막상 앉으면 무슨 말부터 해야 할지 모릅니다.</p>
+    <p class="body-text reveal"><strong>AI한테는 다 말할 수 있습니다.</strong> 판단하지 않습니다. 소문도 나지 않습니다. 그리고 냉정하게 숫자로 답해줍니다.</p>
+
+    <div class="pain-grid">
+      <div class="pain-item reveal">
+        <div class="pain-num">01</div>
+        <strong>치부를 말하기 꺼린다</strong>
+        <p>외도, 폭력, 재산 은닉 — 변호사 앞에서 꺼내기 어렵습니다</p>
+      </div>
+      <div class="pain-item reveal">
+        <div class="pain-num">02</div>
+        <strong>변호사 상담 1시간에 30만원</strong>
+        <p>뭘 물어봐야 할지도 모른 채 시간이 갑니다</p>
+      </div>
+      <div class="pain-item reveal">
+        <div class="pain-num">03</div>
+        <strong>말로는 다 전달이 안 된다</strong>
+        <p>막상 앉으면 정리가 안 돼서 핵심을 빠뜨립니다</p>
+      </div>
+      <div class="pain-item reveal">
+        <div class="pain-num">04</div>
+        <strong>결론이 흐지부지</strong>
+        <p>상담 후에도 "그래서 어떻게 하라고?" 가 불명확합니다</p>
+      </div>
+      <div class="pain-item reveal">
+        <div class="pain-num">05</div>
+        <strong>하루에도 12번 흔들린다</strong>
+        <p>감정이 이랬다저랬다. 냉정한 숫자와 법률이 필요합니다</p>
+      </div>
+      <div class="pain-item reveal">
+        <div class="pain-num">06</div>
+        <strong>변호사마다 레벨이 다르다</strong>
+        <p>누구를 믿어야 할지, 잘하는 건지 모릅니다</p>
+      </div>
+    </div>
+
+    <div class="insight reveal">
+      이혼을 고민하는 사람에게 필요한 건 공감이 아닙니다.<br>
+      <em>"내가 이혼하면 실제로 어떻게 되는가"</em>에 대한<br>
+      냉정하고 명확한 답입니다.
+    </div>
+  </div>
+</section>
+
+<!-- 포지셔닝 -->
+<section>
+  <div class="container">
+    <div class="section-eyebrow reveal">우리가 하는 것</div>
+    <h2 class="reveal">이혼하면<br>나는 어떻게 되나</h2>
+
+    <div class="position-box reveal">
+      <h3>"이혼하면 나는 어떻게 되나" — 시뮬레이션으로 답합니다</h3>
+      <p>재산분할, 양육권, 위자료, 소송 기간, 비용까지. 당신의 상황을 입력하면 AI가 분석하고 현실적인 리포트를 발행합니다. 감정이 흔들릴 때마다 꺼내보는 냉정한 나침반이 됩니다.</p>
+    </div>
+
+    <p class="body-text reveal">예측이 아닙니다. <strong>지금 내 상황에서의 최선의 선택지 설계</strong>입니다.</p>
+    <p class="body-text reveal">변호사를 만나기 전, 이 리포트 하나로 협상 테이블에서 무엇을 요구해야 할지 명확해집니다.</p>
+  </div>
+</section>
+
+<!-- 리포트 구성 -->
+<section>
+  <div class="container">
+    <div class="section-eyebrow reveal">리포트 구성</div>
+    <h2 class="reveal">결론부터,<br>결론으로 끝납니다</h2>
+    <p class="body-text reveal">감정이 흔들리는 의뢰인은 앞뒤만 읽어도 결론을 알 수 있어야 합니다. 총 50~60페이지.</p>
+
+    <div class="report-list reveal">
+      <div class="report-item">
+        <div class="report-num">01</div>
+        <div class="report-content">
+          <h4>당신의 상황</h4>
+          <p>재산분할 예상 수령액, 위자료 범위, 양육권 가능성, 권장 경로 — 핵심 결론 먼저</p>
+        </div>
+        <div class="report-pages">3p</div>
+      </div>
+      <div class="report-item">
+        <div class="report-num">02</div>
+        <div class="report-content">
+          <h4>현재 상황 객관 분석</h4>
+          <p>법적 지위, 유리한 점·불리한 점, 상대방이 내세울 주장과 반박 포인트</p>
+        </div>
+        <div class="report-pages">5p</div>
+      </div>
+      <div class="report-item">
+        <div class="report-num">03</div>
+        <div class="report-content">
+          <h4>재산분할 시뮬레이션</h4>
+          <p>공동재산 산정, 기여도 반영, 낮음·평균·높음 3시나리오 예상 수령액</p>
+        </div>
+        <div class="report-pages">15p</div>
+      </div>
+      <div class="report-item">
+        <div class="report-num">04</div>
+        <div class="report-content">
+          <h4>위자료 분석</h4>
+          <p>유책 사유별 위자료 범위, 증거 수준별 시나리오, 쌍방과실 처리</p>
+        </div>
+        <div class="report-pages">10p</div>
+      </div>
+      <div class="report-item">
+        <div class="report-num">05</div>
+        <div class="report-content">
+          <h4>양육권 · 양육비 <span style="color:#555;font-size:12px;font-weight:300;">(자녀 있는 경우)</span></h4>
+          <p>양육권 확보 가능성, 양육비 계산, 면접교섭권, 미지급 시 대응</p>
+        </div>
+        <div class="report-pages">10p</div>
+      </div>
+      <div class="report-item">
+        <div class="report-num">06</div>
+        <div class="report-content">
+          <h4>협의이혼 vs 소송이혼</h4>
+          <p>두 경로 비교, 권장 경로와 이유, 협상 테이블에서 양보하지 말아야 할 것</p>
+        </div>
+        <div class="report-pages">8p</div>
+      </div>
+      <div class="report-item">
+        <div class="report-num">07</div>
+        <div class="report-content">
+          <h4>이혼 후 생활 시뮬레이션</h4>
+          <p>1년 후 재정, 주거 변화, 걱정했던 것 vs 실제로 걱정해야 할 것</p>
+        </div>
+        <div class="report-pages">10p</div>
+      </div>
+      <div class="report-item">
+        <div class="report-num">08</div>
+        <div class="report-content">
+          <h4>지금 당장 해야 할 것</h4>
+          <p>증거 수집 체크리스트, 재산 파악 방법, 변호사한테 꼭 물어봐야 할 질문 5가지</p>
+        </div>
+        <div class="report-pages">8p</div>
+      </div>
+      <div class="report-item">
+        <div class="report-num">09</div>
+        <div class="report-content">
+          <h4>최종 결론</h4>
+          <p>1챕터 결론 재확인, 다음 3가지 액션 플랜, 이 리포트 활용법</p>
+        </div>
+        <div class="report-pages">4p</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 상품 구성 -->
+<section>
+  <div class="container">
+    <div class="section-eyebrow reveal">상품 구성</div>
+    <h2 class="reveal">선택하십시오</h2>
+
+    <div class="product-grid reveal">
+      <div class="product-card">
+        <div class="p-label">FREE</div>
+        <div class="p-name">무료 진단</div>
+        <div class="p-price">0원</div>
+        <div class="p-desc">간단 상황 입력 → 대략적인 재산분할 범위 확인.<br>본 리포트 구매 시 적용.</div>
+      </div>
+      <div class="product-card main">
+        <div class="p-label">RECOMMENDED</div>
+        <div class="p-name">이혼 설계 리포트</div>
+        <div class="p-price">199,000원</div>
+        <div class="p-desc">50~60페이지 PDF 리포트. 재산분할·위자료·양육권 완전 분석. 변호사 상담 전 필독.</div>
+      </div>
+      <div class="product-card">
+        <div class="p-label">ADD-ON</div>
+        <div class="p-name">추가 질문</div>
+        <div class="p-price">39,000원</div>
+        <div class="p-desc">리포트 수령 후 궁금한 점 3문 3답. 24시간 내 발송.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section>
+  <div class="container">
+    <div class="section-eyebrow reveal">자주 묻는 질문</div>
+    <h2 class="reveal">궁금한 것들</h2>
+
+    <div class="reveal">
+      <div class="faq-item">
+        <div class="faq-q">이건 법률 조언인가요?</div>
+        <div class="faq-a">아닙니다. AI 법률 시뮬레이션 서비스입니다. 제공된 정보를 바탕으로 현실적인 범위와 경로를 시뮬레이션하며, 실제 법적 결과는 법원 판단에 따라 달라집니다. 중요한 결정은 반드시 변호사와 상담하십시오.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">리포트는 언제 받을 수 있나요?</div>
+        <div class="faq-a">결제 완료 후 익일 오후 3시 30분에 이메일로 발송됩니다.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">입력한 정보는 안전한가요?</div>
+        <div class="faq-a">입력하신 정보는 리포트 생성에만 사용되며, 제3자에게 제공되지 않습니다. 리포트 발송 후 삭제됩니다.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">이혼을 아직 결심하지 못했어도 신청할 수 있나요?</div>
+        <div class="faq-a">오히려 결심 전에 보시는 게 더 유용합니다. "이혼하면 나는 어떻게 되는가"를 미리 알아야 올바른 결정을 내릴 수 있습니다.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">환불이 가능한가요?</div>
+        <div class="faq-a">리포트 특성상 생성 시작 후에는 환불이 불가합니다. 결제 전 신중하게 결정해주십시오.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="reveal">지금 바로<br>확인하십시오</h2>
+    <p class="reveal">감정이 아닌 숫자로, 상황을 직시할 시간입니다.</p>
+    <a href="divorce_form.html" class="cta-btn reveal">리포트 신청하기</a>
+    <div class="cta-note reveal">익일 오후 3시 30분 이메일 발송 · 50~60페이지 PDF</div>
+  </div>
+</section>
+
+<!-- 푸터 -->
+<footer>
+  <div class="logo">헤어질<span>,</span> 결심</div>
+  <div class="meta">
+    베러비전 · bettervision.co.kr<br>
+    문의: faith@bettervision.co.kr
+  </div>
+</footer>
+
+<script>
+  // 스크롤 네비
+  window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // 스크롤 reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -26,7 +26,7 @@
     background: var(--black);
     color: var(--white);
     font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     min-height: 100vh;
     font-size: 18px;
     -webkit-font-smoothing: antialiased;
@@ -62,7 +62,7 @@
   .brand-desc {
     margin-top: 12px;
     font-size: 17px;
-    color: #ccc;
+    color: #e0e0e0;
     letter-spacing: 1px;
   }
 
@@ -77,7 +77,8 @@
   }
   .progress-label {
     font-size: 15px;
-    color: #bbb;
+    font-weight: 500;
+    color: #ffffff;
     letter-spacing: 1px;
     transition: color 0.3s;
   }
@@ -101,6 +102,7 @@
   }
   .step-num {
     font-size: 15px;
+    font-weight: 500;
     letter-spacing: 4px;
     color: var(--red);
     margin-bottom: 12px;
@@ -114,7 +116,8 @@
   }
   .step-desc {
     font-size: 16px;
-    color: #ccc;
+    font-weight: 400;
+    color: #ffffff;
     line-height: 1.8;
   }
 
@@ -124,7 +127,8 @@
   }
   .field-label {
     font-size: 16px;
-    color: #ddd;
+    font-weight: 500;
+    color: #ffffff;
     letter-spacing: 0px;
     margin-bottom: 8px;
     display: flex;
@@ -133,11 +137,13 @@
   }
   .field-label .required {
     color: var(--red);
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: 500;
   }
   .field-hint {
     font-size: 14px;
-    color: #aaa;
+    font-weight: 400;
+    color: #cccccc;
     margin-bottom: 10px;
     line-height: 1.7;
   }
@@ -154,7 +160,7 @@
     padding: 16px 18px;
     font-size: 16px;
     font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     outline: none;
     transition: border-color 0.2s;
     -webkit-appearance: none;
@@ -175,14 +181,14 @@
     padding: 12px 22px;
     background: var(--input-bg);
     border: 1px solid var(--line);
-    color: #ccc;
+    color: #e0e0e0;
     font-size: 16px;
     font-family: 'Noto Sans KR', sans-serif;
     cursor: pointer;
     transition: all 0.2s;
     user-select: none;
   }
-  .btn-option:hover { border-color: #888; color: #999; }
+  .btn-option:hover { border-color: #888; color: #cccccc; }
   .btn-option.selected {
     background: var(--red);
     border-color: var(--red);
@@ -220,13 +226,15 @@
     margin-top: 8px;
   }
   .slider-label {
-    font-size: 13px;
-    color: #888;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
   }
   .slider-value {
     text-align: center;
     margin-top: 12px;
     font-size: 15px;
+    font-weight: 500;
     color: var(--red);
     letter-spacing: 1px;
   }
@@ -248,7 +256,7 @@
   .btn-prev {
     background: transparent;
     border: 1px solid var(--line);
-    color: #999;
+    color: #cccccc;
     padding: 14px 32px;
     font-size: 15px;
     font-family: 'Noto Sans KR', sans-serif;
@@ -256,7 +264,7 @@
     transition: border-color 0.2s, color 0.2s;
     letter-spacing: 1px;
   }
-  .btn-prev:hover { border-color: #999; color: #aaa; }
+  .btn-prev:hover { border-color: #cccccc; color: #e0e0e0; }
   .btn-next, .btn-submit {
     background: var(--red);
     border: none;
@@ -312,7 +320,7 @@
   }
   .done-text {
     font-size: 14px;
-    color: #999;
+    color: #cccccc;
     line-height: 2;
   }
 
